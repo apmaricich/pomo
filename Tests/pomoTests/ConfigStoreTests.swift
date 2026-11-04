@@ -61,7 +61,7 @@ final class ConfigStoreTests: XCTestCase {
             .appendingPathComponent("pomo")
         let configPath = configDir.appendingPathComponent("config.json")
 
-        try? "not valid json".data(using: .utf8)?.write(to: configPath)
+        try? Data("not valid json".utf8).write(to: configPath)
 
         let config = loadConfig()
         XCTAssertEqual(config.duration, 25)

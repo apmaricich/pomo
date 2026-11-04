@@ -19,6 +19,8 @@ swift run -c release pomo -b 3            # 3-min break
 swift run -c release pomo -s /path/to/chime.wav               # Custom sound (any format)
 swift run -c release pomo -d 15 -s ~/Sounds/alert.mp3         # Custom duration + sound
 swift run -c release pomo --help
+
+# Press 'p' to pause/resume, 'c' to skip to next segment
 ```
 
 ## Testing

@@ -54,7 +54,36 @@ func renderTimer(elapsed: Int, total: Int, phase: String, cycle: Int, color: Str
         + "\(ANSI.colorMagenta)\(phase)\(ANSI.reset) "
         + "(cycle \(cycle)) "
         + "\(ANSI.colorYellow)⏱ \(formatTime(elapsed))\(ANSI.reset) "
-        + "remaining: \(ANSI.colorRed)\(formatTime(remaining))\(ANSI.reset)"
+        + "remaining: \(ANSI.colorRed)\(formatTime(remaining))\(ANSI.reset) "
+        + "\(ANSI.colorGreen)[p] pause [c] skip\(ANSI.reset)"
+
+    writeLine(line)
+}
+
+/// Render the paused display, showing the timer is paused.
+///
+/// - Parameters:
+///   - elapsed: Elapsed seconds for the current segment.
+///   - total: Total seconds for the current segment.
+///   - phase: Current phase (e.g., "WORK" or "BREAK").
+///   - cycle: Current cycle number (1-based).
+///   - color: ANSI color for the progress bar.
+func renderPaused(elapsed: Int, total: Int, phase: String, cycle: Int, color: String) {
+    let remaining = max(0, total - elapsed)
+
+    // Progress bar: 30 characters wide.
+    let width = 30
+    let filled = Int(Double(elapsed) / Double(total) * Double(width))
+    let bar = String(repeating: "█", count: filled) + String(repeating: "░", count: width - filled)
+
+    let line = "\(ANSI.clearLine)"
+        + "\(color)│\(bar)│\(ANSI.reset) "
+        + "\(ANSI.colorYellow)⏸ PAUSED\(ANSI.reset) "
+        + "\(ANSI.colorMagenta)\(phase)\(ANSI.reset) "
+        + "(cycle \(cycle)) "
+        + "\(ANSI.colorYellow)⏱ \(formatTime(elapsed))\(ANSI.reset) "
+        + "remaining: \(ANSI.colorRed)\(formatTime(remaining))\(ANSI.reset) "
+        + "\(ANSI.colorGreen)[p] resume [c] skip\(ANSI.reset)"
 
     writeLine(line)
 }
@@ -141,7 +170,7 @@ func waitForContinue(completed: Int, phase: String, cycle: Int, color: String) -
     }
 }
 
-/// Run a single timer segment (work or break) with overflow support.
+/// Run a single timer segment (work or break) with pause, resume, and overflow support.
 ///
 /// - Parameters:
 ///   - duration: Duration of the segment in minutes.
@@ -155,11 +184,53 @@ func waitForContinue(completed: Int, phase: String, cycle: Int, color: String) -
 func runSegment(duration: Int, phase: String, cycle: Int, color: String,
                 onTimerComplete: (() -> Void)? = nil) async -> Int {
     let totalSeconds = duration * 60
+    let segmentDuration = totalSeconds
 
-    for elapsed in 0..<totalSeconds {
-        renderTimer(elapsed: elapsed, total: totalSeconds, phase: phase, cycle: cycle, color: color)
-        sleep(1)
+    let segmentStartTime = Date()
+    var paused = false
+    var totalPausedSeconds = 0
+    var pauseStartTime: Date? = nil
+
+    // Run the countdown loop using real elapsed time.
+    // While paused, elapsed does not advance; on resume, remaining time continues.
+    while true {
+        let rawElapsed = Int(Date().timeIntervalSince(segmentStartTime))
+        let elapsed = rawElapsed - totalPausedSeconds
+
+        if elapsed >= totalSeconds {
+            break
+        }
+
+        if paused {
+            renderPaused(elapsed: elapsed, total: totalSeconds, phase: phase, cycle: cycle, color: color)
+        } else {
+            renderTimer(elapsed: elapsed, total: totalSeconds, phase: phase, cycle: cycle, color: color)
+        }
+
+        if let ch = readChar() {
+            if ch == "p" || ch == "P" {
+                if !paused {
+                    paused = true
+                    pauseStartTime = Date()
+                } else {
+                    paused = false
+                    if let pauseStart = pauseStartTime {
+                        totalPausedSeconds += Int(Date().timeIntervalSince(pauseStart))
+                    }
+                    pauseStartTime = nil
+                }
+                continue
+            }
+            if ch == "c" || ch == "C" {
+                break
+            }
+        }
+
+        usleep(100_000)
     }
+
+    // Calculate total segment time (including pause)
+    let totalSegmentTime = Int(Date().timeIntervalSince(segmentStartTime))
 
     // Final tick: show 100% complete
     renderTimer(elapsed: totalSeconds, total: totalSeconds, phase: phase, cycle: cycle, color: color)
@@ -168,8 +239,8 @@ func runSegment(duration: Int, phase: String, cycle: Int, color: String,
     onTimerComplete?()
 
     // Wait for user to press 'c' to continue
-    let overflow = waitForContinue(completed: totalSeconds, phase: phase, cycle: cycle, color: color)
+    let overflow = waitForContinue(completed: segmentDuration, phase: phase, cycle: cycle, color: color)
 
     writeLine("\n")
-    return totalSeconds + overflow
+    return totalSegmentTime + overflow
 }

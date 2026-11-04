@@ -10,6 +10,7 @@ A terminal Pomodoro timer written in Swift.
 - Falls back to terminal bell when not in herdr
 - ANSI-colored countdown display
 - Custom notification sound (MP3, WAV, AAC, FLAC, and more)
+- Pause/resume timer with 'p' key
 - Persistent configuration in ~/.config/pomo/config.json
 
 ![Pomodoro timer](Resources/timer.png)
@@ -31,7 +32,17 @@ pomo -s /path/to/chime.wav
 
 # Multiple cycles with custom sound
 pomo -c 3 -s ~/Sounds/pomo.mp3
+
+# Pause/resume: press 'p' during any segment
+# Skip to next segment: press 'c' during any segment
 ```
+
+## Timer Controls
+
+- **p / P** — Pause or resume the timer
+- **c / C** — Skip to the next segment (or completion)
+
+When paused, the timer shows a "PAUSED" indicator and the remaining time freezes. Press 'p' again to resume.
 
 ## Configuration
 
