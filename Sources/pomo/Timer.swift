@@ -148,9 +148,12 @@ func waitForContinue(completed: Int, phase: String, cycle: Int, color: String) -
 ///   - phase: Label for the phase (e.g., "WORK").
 ///   - cycle: Cycle number for display.
 ///   - color: ANSI color for the progress bar.
+///   - onTimerComplete: Optional callback invoked when the timer reaches zero,
+///     before the user is prompted to continue.
 ///
 /// - Returns: The total time spent in this segment (including overflow), in seconds.
-func runSegment(duration: Int, phase: String, cycle: Int, color: String) async -> Int {
+func runSegment(duration: Int, phase: String, cycle: Int, color: String,
+                onTimerComplete: (() -> Void)? = nil) async -> Int {
     let totalSeconds = duration * 60
 
     for elapsed in 0..<totalSeconds {
@@ -160,6 +163,9 @@ func runSegment(duration: Int, phase: String, cycle: Int, color: String) async -
 
     // Final tick: show 100% complete
     renderTimer(elapsed: totalSeconds, total: totalSeconds, phase: phase, cycle: cycle, color: color)
+
+    // Notify caller that the segment is done
+    onTimerComplete?()
 
     // Wait for user to press 'c' to continue
     let overflow = waitForContinue(completed: totalSeconds, phase: phase, cycle: cycle, color: color)

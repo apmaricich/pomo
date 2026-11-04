@@ -17,18 +17,23 @@ func main() async {
                 duration: config.duration,
                 phase: "WORK",
                 cycle: cycle,
-                color: ANSI.colorGreen
+                color: ANSI.colorGreen,
+                onTimerComplete: {
+                    notify(title: "Work complete", body: "Take a \(config.breakDuration)-minute break", customSound: config.sound)
+                }
             )
             _ = workElapsed
 
-            notify(title: "Work complete", body: "Take a \(config.breakDuration)-minute break", customSound: config.sound)
-
             if cycle < config.cycles {
+                notify(title: "Break starting", body: "\(config.breakDuration)-minute break")
                 let breakElapsed = await runSegment(
                     duration: config.breakDuration,
                     phase: "BREAK",
                     cycle: cycle,
-                    color: ANSI.colorBlue
+                    color: ANSI.colorBlue,
+                    onTimerComplete: {
+                        notify(title: "Break complete", body: "Start working when you are ready", customSound: config.sound)
+                    }
                 )
                 _ = breakElapsed
             }
