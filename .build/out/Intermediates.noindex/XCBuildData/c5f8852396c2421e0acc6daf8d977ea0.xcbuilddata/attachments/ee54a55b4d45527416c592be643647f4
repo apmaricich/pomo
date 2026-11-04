@@ -1,4 +1,0 @@
-module pomo {
-header "pomo-Swift.h"
-export *
-}
