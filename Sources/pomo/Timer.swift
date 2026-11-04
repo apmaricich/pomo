@@ -59,27 +59,110 @@ func renderTimer(elapsed: Int, total: Int, phase: String, cycle: Int, color: Str
     writeLine(line)
 }
 
-/// Wait one second, yielding to the runtime so other tasks can run.
-func sleepOneSecond() async {
-    try? await Task.sleep(nanoseconds: 1_000_000_000)
+/// Render the overflow display, showing how long past the timer the user is.
+///
+/// - Parameters:
+///   - overflow: Seconds elapsed past the timer's original duration.
+///   - phase: Current phase (e.g., "WORK" or "BREAK").
+///   - cycle: Current cycle number (1-based).
+///   - color: ANSI color for the progress bar.
+func renderOverflow(overflow: Int, phase: String, cycle: Int, color: String) {
+    let width = 30
+    let bar = String(repeating: "█", count: width)
+
+    let line = "\(ANSI.clearLine)"
+        + "\(color)│\(bar)│\(ANSI.reset) "
+        + "\(ANSI.colorMagenta)\(phase)\(ANSI.reset) "
+        + "(cycle \(cycle)) "
+        + "\(ANSI.colorYellow)⏱ \(formatTime(overflow))\(ANSI.reset) "
+        + "overflow: \(ANSI.colorRed)\(formatTime(overflow))\(ANSI.reset)"
+
+    writeLine(line)
 }
 
-/// Run a single timer segment (work or break).
+/// Read a single character from the terminal in non-blocking mode.
+/// Returns the character as an optional Character, or nil if no input is available.
+func readChar() -> Character? {
+    var settings = termios()
+    tcgetattr(STDIN_FILENO, &settings)
+
+    defer {
+        tcsetattr(STDIN_FILENO, TCSANOW, &settings)
+    }
+
+    // Turn off echo and canonical mode for immediate input
+    settings.c_lflag &= ~tcflag_t(ECHO)
+    settings.c_lflag &= ~tcflag_t(ICANON)
+
+    // Set VMIN and VTIME for non-blocking read
+    // In Swift on Darwin, c_cc is a tuple of 20 cc_t values.
+    // We need to destructure and reconstruct it.
+    let (c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, _, _, c18, c19) = settings.c_cc
+    let newCcc = (c0, c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15, cc_t(0), cc_t(0), c18, c19)
+    settings.c_cc = newCcc
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &settings)
+
+    var buf = [UInt8](repeating: 0, count: 1)
+    let result = read(STDIN_FILENO, &buf, 1)
+    if result == 1 {
+        return Character(UnicodeScalar(buf[0]))
+    }
+    return nil
+}
+
+/// Wait for the user to press the 'c' key to continue.
+/// Renders the overflow timer continuously until the key is pressed.
+///
+/// - Parameters:
+///   - total: The original duration of the segment in seconds.
+///   - phase: Current phase (e.g., "WORK" or "BREAK").
+///   - cycle: Current cycle number (1-based).
+///   - color: ANSI color for the progress bar.
+///
+/// - Returns: The total time the user stayed in the overflow state, in seconds.
+func waitForContinue(total: Int, phase: String, cycle: Int, color: String) -> Int {
+    let startTime = Date()
+
+    while true {
+        let elapsedOverflow = Int(Date().timeIntervalSince(startTime))
+        renderOverflow(overflow: elapsedOverflow, phase: phase, cycle: cycle, color: color)
+
+        // Check for 'c' key press (non-blocking)
+        if let ch = readChar() {
+            if ch == "c" || ch == "C" {
+                return total + elapsedOverflow
+            }
+        }
+
+        // Sleep briefly to avoid busy-waiting
+        usleep(100_000)
+    }
+}
+
+/// Run a single timer segment (work or break) with overflow support.
 ///
 /// - Parameters:
 ///   - duration: Duration of the segment in minutes.
 ///   - phase: Label for the phase (e.g., "WORK").
 ///   - cycle: Cycle number for display.
 ///   - color: ANSI color for the progress bar.
-func runSegment(duration: Int, phase: String, cycle: Int, color: String) async {
+///
+/// - Returns: The total time spent in this segment (including overflow), in seconds.
+func runSegment(duration: Int, phase: String, cycle: Int, color: String) async -> Int {
     let totalSeconds = duration * 60
 
     for elapsed in 0..<totalSeconds {
         renderTimer(elapsed: elapsed, total: totalSeconds, phase: phase, cycle: cycle, color: color)
-        await sleepOneSecond()
+        sleep(1)
     }
 
-    // Final tick: show 100% complete.
+    // Final tick: show 100% complete
     renderTimer(elapsed: totalSeconds, total: totalSeconds, phase: phase, cycle: cycle, color: color)
+
+    // Wait for user to press 'c' to continue
+    let totalElapsed = waitForContinue(total: totalSeconds, phase: phase, cycle: cycle, color: color)
+
     writeLine("\n")
+    return totalElapsed
 }

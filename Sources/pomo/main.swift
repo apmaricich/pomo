@@ -12,22 +12,24 @@ func main() async {
         notify(title: "Pomodoro starting", body: "Work session: \(config.duration) minutes")
 
         for cycle in 1...config.cycles {
-            await runSegment(
+            let workElapsed = await runSegment(
                 duration: config.duration,
                 phase: "WORK",
                 cycle: cycle,
                 color: ANSI.colorGreen
             )
+            _ = workElapsed
 
             notify(title: "Work complete", body: "Take a \(config.breakDuration)-minute break")
 
             if cycle < config.cycles {
-                await runSegment(
+                let breakElapsed = await runSegment(
                     duration: config.breakDuration,
                     phase: "BREAK",
                     cycle: cycle,
                     color: ANSI.colorBlue
                 )
+                _ = breakElapsed
             }
         }
 
