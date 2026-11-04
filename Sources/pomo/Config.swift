@@ -1,12 +1,5 @@
 import Foundation
 
-/// Parsed CLI configuration for the pomodoro timer.
-struct Config {
-    let duration: Int       // Work session duration in minutes
-    let cycles: Int         // Number of work/break cycles
-    let breakDuration: Int  // Break duration in minutes
-}
-
 enum ParseError: Error, CustomStringConvertible {
     case unknownFlag(String)
     case missingValue(String)
@@ -24,6 +17,14 @@ enum ParseError: Error, CustomStringConvertible {
     }
 }
 
+/// Overrides provided via command-line arguments; nil means "not specified."
+struct CLIOverrides {
+    let duration: Int?
+    let cycles: Int?
+    let breakDuration: Int?
+    let sound: String?
+}
+
 func printUsage() {
     print("""
     Usage: pomo [OPTIONS]
@@ -34,12 +35,14 @@ func printUsage() {
       -d, --duration <minutes>    Work session duration (default: 25)
       -c, --cycles <count>        Number of work/break cycles (default: 1)
       -b, --break <minutes>       Break duration between cycles (default: 5)
+      -s, --sound <path>          Path to MP3 sound file for notifications
       -h, --help                  Show this help message
+
+    Configuration is stored in ~/.config/pomo/config.json. CLI flags
+    override persisted values, which override built-in defaults.
     """)
 }
 
-/// Parse command-line arguments into a Config struct.
-/// Exits with usage on --help; throws ParseError on invalid input.
 private func parsePositiveInt(_ argv: [String], index: inout Int, flag: String) throws -> Int {
     index += 1
     guard index < argv.count else {
@@ -54,10 +57,13 @@ private func parsePositiveInt(_ argv: [String], index: inout Int, flag: String) 
     return value
 }
 
-func parseArguments(_ argv: [String]) throws -> Config {
-    var duration = 25
-    var cycles = 1
-    var breakDuration = 5
+/// Parse command-line arguments into CLIOverrides (nil = not specified).
+/// Exits with usage on --help; throws ParseError on invalid input.
+func parseOverrides(_ argv: [String]) throws -> CLIOverrides {
+    var duration: Int?
+    var cycles: Int?
+    var breakDuration: Int?
+    var sound: String?
 
     var index = 1
     while index < argv.count {
@@ -77,6 +83,13 @@ func parseArguments(_ argv: [String]) throws -> Config {
         case "-b", "--break":
             breakDuration = try parsePositiveInt(argv, index: &index, flag: arg)
 
+        case "-s", "--sound":
+            index += 1
+            guard index < argv.count else {
+                throw ParseError.missingValue(arg)
+            }
+            sound = argv[index]
+
         default:
             throw ParseError.unknownFlag(arg)
         }
@@ -84,5 +97,17 @@ func parseArguments(_ argv: [String]) throws -> Config {
         index += 1
     }
 
-    return Config(duration: duration, cycles: cycles, breakDuration: breakDuration)
+    return CLIOverrides(duration: duration, cycles: cycles, breakDuration: breakDuration, sound: sound)
+}
+
+/// Resolve final configuration: CLI overrides > persisted config > built-in defaults.
+func resolveConfig(_ overrides: CLIOverrides) -> Config {
+    let persisted = loadConfig()
+
+    return Config(
+        duration: overrides.duration ?? persisted.duration,
+        cycles: overrides.cycles ?? persisted.cycles,
+        breakDuration: overrides.breakDuration ?? persisted.breakDuration,
+        sound: overrides.sound ?? persisted.sound
+    )
 }

@@ -4,43 +4,49 @@ import XCTest
 final class ParseArgumentsTests: XCTestCase {
 
     func testDefaultConfig() throws {
-        let config = try parseArguments(["pomo"])
+        let overrides = try parseOverrides(["pomo"])
+        let config = resolveConfig(overrides)
         XCTAssertEqual(config.duration, 25)
         XCTAssertEqual(config.cycles, 1)
         XCTAssertEqual(config.breakDuration, 5)
     }
 
     func testCustomDuration() throws {
-        let config = try parseArguments(["pomo", "-d", "15"])
+        let overrides = try parseOverrides(["pomo", "-d", "15"])
+        let config = resolveConfig(overrides)
         XCTAssertEqual(config.duration, 15)
     }
 
     func testCustomCycles() throws {
-        let config = try parseArguments(["pomo", "-c", "3"])
+        let overrides = try parseOverrides(["pomo", "-c", "3"])
+        let config = resolveConfig(overrides)
         XCTAssertEqual(config.cycles, 3)
     }
 
     func testCustomBreakDuration() throws {
-        let config = try parseArguments(["pomo", "-b", "10"])
+        let overrides = try parseOverrides(["pomo", "-b", "10"])
+        let config = resolveConfig(overrides)
         XCTAssertEqual(config.breakDuration, 10)
     }
 
     func testAllCustomOptions() throws {
-        let config = try parseArguments(["pomo", "-d", "20", "-c", "2", "-b", "3"])
+        let overrides = try parseOverrides(["pomo", "-d", "20", "-c", "2", "-b", "3"])
+        let config = resolveConfig(overrides)
         XCTAssertEqual(config.duration, 20)
         XCTAssertEqual(config.cycles, 2)
         XCTAssertEqual(config.breakDuration, 3)
     }
 
     func testLongFormFlags() throws {
-        let config = try parseArguments(["pomo", "--duration", "30", "--cycles", "4", "--break", "8"])
+        let overrides = try parseOverrides(["pomo", "--duration", "30", "--cycles", "4", "--break", "8"])
+        let config = resolveConfig(overrides)
         XCTAssertEqual(config.duration, 30)
         XCTAssertEqual(config.cycles, 4)
         XCTAssertEqual(config.breakDuration, 8)
     }
 
     func testUnknownFlag() {
-        XCTAssertThrowsError(try parseArguments(["pomo", "-z", "5"])) { error in
+        XCTAssertThrowsError(try parseOverrides(["pomo", "-z", "5"])) { error in
             if let parseError = error as? ParseError {
                 if case .unknownFlag(let flag) = parseError {
                     XCTAssertEqual(flag, "-z")
@@ -54,7 +60,7 @@ final class ParseArgumentsTests: XCTestCase {
     }
 
     func testMissingValue() {
-        XCTAssertThrowsError(try parseArguments(["pomo", "-d"])) { error in
+        XCTAssertThrowsError(try parseOverrides(["pomo", "-d"])) { error in
             if let parseError = error as? ParseError {
                 if case .missingValue(let flag) = parseError {
                     XCTAssertEqual(flag, "-d")
@@ -68,7 +74,7 @@ final class ParseArgumentsTests: XCTestCase {
     }
 
     func testInvalidValue_notANumber() {
-        XCTAssertThrowsError(try parseArguments(["pomo", "-d", "abc"])) { error in
+        XCTAssertThrowsError(try parseOverrides(["pomo", "-d", "abc"])) { error in
             if let parseError = error as? ParseError {
                 if case .invalidValue(let flag, let reason) = parseError {
                     XCTAssertEqual(flag, "-d")
@@ -83,7 +89,7 @@ final class ParseArgumentsTests: XCTestCase {
     }
 
     func testInvalidValue_zero() {
-        XCTAssertThrowsError(try parseArguments(["pomo", "-d", "0"])) { error in
+        XCTAssertThrowsError(try parseOverrides(["pomo", "-d", "0"])) { error in
             if let parseError = error as? ParseError {
                 if case .invalidValue(let flag, let reason) = parseError {
                     XCTAssertEqual(flag, "-d")
@@ -98,7 +104,7 @@ final class ParseArgumentsTests: XCTestCase {
     }
 
     func testInvalidValue_negative() {
-        XCTAssertThrowsError(try parseArguments(["pomo", "-c", "-2"])) { error in
+        XCTAssertThrowsError(try parseOverrides(["pomo", "-c", "-2"])) { error in
             if let parseError = error as? ParseError {
                 if case .invalidValue(let flag, let reason) = parseError {
                     XCTAssertEqual(flag, "-c")

@@ -16,6 +16,8 @@ swift run -c release pomo                # 25-min work session
 swift run -c release pomo -d 15           # Custom duration
 swift run -c release pomo -c 3            # 3 cycles with breaks
 swift run -c release pomo -b 3            # 3-min break
+swift run -c release pomo -s /path/to/chime.wav               # Custom sound (any format)
+swift run -c release pomo -d 15 -s ~/Sounds/alert.mp3         # Custom duration + sound
 swift run -c release pomo --help
 ```
 

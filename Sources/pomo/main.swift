@@ -7,9 +7,10 @@ let args = CommandLine.arguments
 
 func main() async {
     do {
-        let config = try parseArguments(args)
+        let overrides = try parseOverrides(args)
+        let config = resolveConfig(overrides)
 
-        notify(title: "Pomodoro starting", body: "Work session: \(config.duration) minutes")
+        notify(title: "Pomodoro starting", body: "Work session: \(config.duration) minutes", customSound: config.sound)
 
         for cycle in 1...config.cycles {
             let workElapsed = await runSegment(
@@ -20,7 +21,7 @@ func main() async {
             )
             _ = workElapsed
 
-            notify(title: "Work complete", body: "Take a \(config.breakDuration)-minute break")
+            notify(title: "Work complete", body: "Take a \(config.breakDuration)-minute break", customSound: config.sound)
 
             if cycle < config.cycles {
                 let breakElapsed = await runSegment(
@@ -33,7 +34,7 @@ func main() async {
             }
         }
 
-        notify(title: "All cycles complete!", body: "\(config.cycles) pomodoro cycle(s) finished")
+        notify(title: "All cycles complete!", body: "\(config.cycles) pomodoro cycle(s) finished", customSound: config.sound)
         print("\n✅ All \(config.cycles) cycle(s) complete!")
         fflush(stdout)
     } catch {

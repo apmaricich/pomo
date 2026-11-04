@@ -4,7 +4,7 @@ import XCTest
 final class ConfigTests: XCTestCase {
 
     func testConfigStruct() {
-        let config = Config(duration: 20, cycles: 3, breakDuration: 5)
+        let config = Config(duration: 20, cycles: 3, breakDuration: 5, sound: nil)
         XCTAssertEqual(config.duration, 20)
         XCTAssertEqual(config.cycles, 3)
         XCTAssertEqual(config.breakDuration, 5)
