@@ -1,0 +1,31 @@
+{
+  "" : {
+    "const-values" : "/Users/apmaricich/Code/pomo/.build/out/Intermediates.noindex/pomo.build/Release/pomo-p.build/Objects-normal/arm64/pomo-primary.swiftconstvalues",
+    "dependencies" : "/Users/apmaricich/Code/pomo/.build/out/Intermediates.noindex/pomo.build/Release/pomo-p.build/Objects-normal/arm64/pomo-primary.d",
+    "diagnostics" : "/Users/apmaricich/Code/pomo/.build/out/Intermediates.noindex/pomo.build/Release/pomo-p.build/Objects-normal/arm64/pomo-primary.dia",
+    "emit-module-dependencies" : "/Users/apmaricich/Code/pomo/.build/out/Intermediates.noindex/pomo.build/Release/pomo-p.build/Objects-normal/arm64/pomo-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/apmaricich/Code/pomo/.build/out/Intermediates.noindex/pomo.build/Release/pomo-p.build/Objects-normal/arm64/pomo-primary-emit-module.dia",
+    "pch" : "/Users/apmaricich/Code/pomo/.build/out/Intermediates.noindex/pomo.build/Release/pomo-p.build/Objects-normal/arm64/pomo-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/apmaricich/Code/pomo/.build/out/Intermediates.noindex/pomo.build/Release/pomo-p.build/Objects-normal/arm64/pomo-primary.swiftdeps"
+  },
+  "/Users/apmaricich/Code/pomo/Sources/pomo/Config.swift" : {
+    "index-unit-output-path" : "/pomo.build/Release/pomo-p.build/Objects-normal/arm64/Config.o",
+    "llvm-bc" : "/Users/apmaricich/Code/pomo/.build/out/Intermediates.noindex/pomo.build/Release/pomo-p.build/Objects-normal/arm64/Config.bc",
+    "object" : "/Users/apmaricich/Code/pomo/.build/out/Intermediates.noindex/pomo.build/Release/pomo-p.build/Objects-normal/arm64/Config.o"
+  },
+  "/Users/apmaricich/Code/pomo/Sources/pomo/Herdr.swift" : {
+    "index-unit-output-path" : "/pomo.build/Release/pomo-p.build/Objects-normal/arm64/Herdr.o",
+    "llvm-bc" : "/Users/apmaricich/Code/pomo/.build/out/Intermediates.noindex/pomo.build/Release/pomo-p.build/Objects-normal/arm64/Herdr.bc",
+    "object" : "/Users/apmaricich/Code/pomo/.build/out/Intermediates.noindex/pomo.build/Release/pomo-p.build/Objects-normal/arm64/Herdr.o"
+  },
+  "/Users/apmaricich/Code/pomo/Sources/pomo/Timer.swift" : {
+    "index-unit-output-path" : "/pomo.build/Release/pomo-p.build/Objects-normal/arm64/Timer.o",
+    "llvm-bc" : "/Users/apmaricich/Code/pomo/.build/out/Intermediates.noindex/pomo.build/Release/pomo-p.build/Objects-normal/arm64/Timer.bc",
+    "object" : "/Users/apmaricich/Code/pomo/.build/out/Intermediates.noindex/pomo.build/Release/pomo-p.build/Objects-normal/arm64/Timer.o"
+  },
+  "/Users/apmaricich/Code/pomo/Sources/pomo/main.swift" : {
+    "index-unit-output-path" : "/pomo.build/Release/pomo-p.build/Objects-normal/arm64/main.o",
+    "llvm-bc" : "/Users/apmaricich/Code/pomo/.build/out/Intermediates.noindex/pomo.build/Release/pomo-p.build/Objects-normal/arm64/main.bc",
+    "object" : "/Users/apmaricich/Code/pomo/.build/out/Intermediates.noindex/pomo.build/Release/pomo-p.build/Objects-normal/arm64/main.o"
+  }
+}

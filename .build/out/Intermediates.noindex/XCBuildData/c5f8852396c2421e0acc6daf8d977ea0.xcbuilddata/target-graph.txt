@@ -1,0 +1,10 @@
+Target dependency graph (4 targets)
+Target 'AllIncludingTests' in project 'Aggregate'
+➜ Explicit dependency on target 'pomoTests-product' in project 'pomo'
+➜ Dependency on target 'pomoTests-product' in project 'pomo' via transitive dependency through 'pomoTests-test-runner'
+➜ Explicit dependency on target 'pomo-product' in project 'pomo'
+Target 'pomoTests-product' in project 'pomo'
+➜ Explicit dependency on target 'pomo-product' in project 'pomo'
+➜ Explicit dependency on target 'pomo' in project 'pomo'
+Target 'pomo' in project 'pomo' (no dependencies)
+Target 'pomo-product' in project 'pomo' (no dependencies)
