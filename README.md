@@ -10,6 +10,8 @@ A terminal Pomodoro timer written in Swift.
 - Falls back to terminal bell when not in herdr
 - ANSI-colored countdown display
 
+![Pomodoro timer](Resources/timer.png)
+
 ## Usage
 
 ```bash
