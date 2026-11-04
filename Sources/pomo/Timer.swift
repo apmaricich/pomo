@@ -62,11 +62,12 @@ func renderTimer(elapsed: Int, total: Int, phase: String, cycle: Int, color: Str
 /// Render the overflow display, showing how long past the timer the user is.
 ///
 /// - Parameters:
-///   - overflow: Seconds elapsed past the timer's original duration.
+///   - completed: The completed duration of the segment in seconds.
+///   - overflow: Seconds elapsed past the segment's original duration.
 ///   - phase: Current phase (e.g., "WORK" or "BREAK").
 ///   - cycle: Current cycle number (1-based).
 ///   - color: ANSI color for the progress bar.
-func renderOverflow(overflow: Int, phase: String, cycle: Int, color: String) {
+func renderOverflow(completed: Int, overflow: Int, phase: String, cycle: Int, color: String) {
     let width = 30
     let bar = String(repeating: "█", count: width)
 
@@ -74,7 +75,7 @@ func renderOverflow(overflow: Int, phase: String, cycle: Int, color: String) {
         + "\(color)│\(bar)│\(ANSI.reset) "
         + "\(ANSI.colorMagenta)\(phase)\(ANSI.reset) "
         + "(cycle \(cycle)) "
-        + "\(ANSI.colorYellow)⏱ \(formatTime(overflow))\(ANSI.reset) "
+        + "\(ANSI.colorYellow)⏱ \(formatTime(completed))\(ANSI.reset) "
         + "overflow: \(ANSI.colorRed)\(formatTime(overflow))\(ANSI.reset)"
 
     writeLine(line)
@@ -115,23 +116,23 @@ func readChar() -> Character? {
 /// Renders the overflow timer continuously until the key is pressed.
 ///
 /// - Parameters:
-///   - total: The original duration of the segment in seconds.
+///   - completed: The completed duration of the segment in seconds.
 ///   - phase: Current phase (e.g., "WORK" or "BREAK").
 ///   - cycle: Current cycle number (1-based).
 ///   - color: ANSI color for the progress bar.
 ///
 /// - Returns: The total time the user stayed in the overflow state, in seconds.
-func waitForContinue(total: Int, phase: String, cycle: Int, color: String) -> Int {
+func waitForContinue(completed: Int, phase: String, cycle: Int, color: String) -> Int {
     let startTime = Date()
 
     while true {
         let elapsedOverflow = Int(Date().timeIntervalSince(startTime))
-        renderOverflow(overflow: elapsedOverflow, phase: phase, cycle: cycle, color: color)
+        renderOverflow(completed: completed, overflow: elapsedOverflow, phase: phase, cycle: cycle, color: color)
 
         // Check for 'c' key press (non-blocking)
         if let ch = readChar() {
             if ch == "c" || ch == "C" {
-                return total + elapsedOverflow
+                return elapsedOverflow
             }
         }
 
@@ -161,8 +162,8 @@ func runSegment(duration: Int, phase: String, cycle: Int, color: String) async -
     renderTimer(elapsed: totalSeconds, total: totalSeconds, phase: phase, cycle: cycle, color: color)
 
     // Wait for user to press 'c' to continue
-    let totalElapsed = waitForContinue(total: totalSeconds, phase: phase, cycle: cycle, color: color)
+    let overflow = waitForContinue(completed: totalSeconds, phase: phase, cycle: cycle, color: color)
 
     writeLine("\n")
-    return totalElapsed
+    return totalSeconds + overflow
 }
