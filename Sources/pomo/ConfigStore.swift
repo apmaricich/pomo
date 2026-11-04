@@ -15,12 +15,19 @@ struct Config {
 private let configDirName = "pomo"
 private let configFileName = "config.json"
 
+private func getHomeDir() -> URL {
+    if let home = ProcessInfo.processInfo.environment["HOME"] {
+        return URL(fileURLWithPath: home)
+    }
+    return FileManager.default.homeDirectoryForCurrentUser
+}
+
 /// Loads the persisted configuration from `~/.config/pomo/config.json`.
 /// Returns default configuration if the file is missing or unreadable.
 func loadConfig() -> Config {
     let defaults = Config(duration: 25, cycles: 1, breakDuration: 5, sound: nil)
 
-    let homeDir = FileManager.default.homeDirectoryForCurrentUser
+    let homeDir = getHomeDir()
     let configDir = homeDir
         .appendingPathComponent(".config")
         .appendingPathComponent(configDirName)
@@ -43,7 +50,7 @@ func loadConfig() -> Config {
 /// Saves the given configuration to `~/.config/pomo/config.json`.
 /// Creates the directory if it does not already exist.
 func saveConfig(_ config: Config) {
-    let homeDir = FileManager.default.homeDirectoryForCurrentUser
+    let homeDir = getHomeDir()
     let configDir = homeDir
         .appendingPathComponent(".config")
         .appendingPathComponent(configDirName)
