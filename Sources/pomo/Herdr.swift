@@ -22,19 +22,12 @@ func playCustomSound(_ path: String) {
 
     do {
         try task.run()
-        task.waitUntilExit()
-        let success = task.terminationStatus == 0
+        // afplay plays in background; program continues immediately
         try? out?.close()
         try? err?.close()
-        if !success {
-            write(STDOUT_FILENO, "\u{7}", 1)
-            fflush(stdout)
-        }
     } catch {
         try? out?.close()
         try? err?.close()
-        write(STDOUT_FILENO, "\u{7}", 1)
-        fflush(stdout)
     }
 }
 
