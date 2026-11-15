@@ -55,9 +55,17 @@ func renderTimer(elapsed: Int, total: Int, phase: String, cycle: Int, color: Str
         + "(cycle \(cycle)) "
         + "\(ANSI.colorYellow)⏱ \(formatTime(elapsed))\(ANSI.reset) "
         + "remaining: \(ANSI.colorRed)\(formatTime(remaining))\(ANSI.reset) "
-        + "\(ANSI.colorGreen)[p] pause [c] skip\(ANSI.reset)"
+        + pauseSkipHint(phase: phase)
 
     writeLine(line)
+}
+
+/// Return the appropriate pause/skip hint for the given phase.
+func pauseSkipHint(phase: String) -> String {
+    if phase == "BREAK" {
+        return "\(ANSI.colorGreen)[p] pause break [c] skip break\(ANSI.reset)"
+    }
+    return "\(ANSI.colorGreen)[p] pause [c] skip\(ANSI.reset)"
 }
 
 /// Render the paused display, showing the timer is paused.
@@ -83,9 +91,17 @@ func renderPaused(elapsed: Int, total: Int, phase: String, cycle: Int, color: St
         + "(cycle \(cycle)) "
         + "\(ANSI.colorYellow)⏱ \(formatTime(elapsed))\(ANSI.reset) "
         + "remaining: \(ANSI.colorRed)\(formatTime(remaining))\(ANSI.reset) "
-        + "\(ANSI.colorGreen)[p] resume [c] skip\(ANSI.reset)"
+        + pauseResumeHint(phase: phase)
 
     writeLine(line)
+}
+
+/// Return the appropriate pause/resume hint for the given phase.
+func pauseResumeHint(phase: String) -> String {
+    if phase == "BREAK" {
+        return "\(ANSI.colorGreen)[p] resume break [c] skip break\(ANSI.reset)"
+    }
+    return "\(ANSI.colorGreen)[p] resume [c] skip\(ANSI.reset)"
 }
 
 /// Render the overflow display, showing how long past the timer the user is.
@@ -105,9 +121,18 @@ func renderOverflow(completed: Int, overflow: Int, phase: String, cycle: Int, co
         + "\(ANSI.colorMagenta)\(phase)\(ANSI.reset) "
         + "(cycle \(cycle)) "
         + "\(ANSI.colorYellow)⏱ \(formatTime(completed))\(ANSI.reset) "
-        + "overflow: \(ANSI.colorRed)\(formatTime(overflow))\(ANSI.reset)"
+        + "overflow: \(ANSI.colorRed)\(formatTime(overflow))\(ANSI.reset) "
+        + continueHint(phase: phase)
 
     writeLine(line)
+}
+
+/// Return the appropriate continue/skip hint for the overflow display.
+func continueHint(phase: String) -> String {
+    if phase == "BREAK" {
+        return "\(ANSI.colorGreen)[c] start work\(ANSI.reset)"
+    }
+    return "\(ANSI.colorGreen)[c] take break\(ANSI.reset)"
 }
 
 /// Read a single character from the terminal in non-blocking mode.
