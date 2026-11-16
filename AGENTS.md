@@ -18,6 +18,12 @@ swift run -c release pomo -c 3            # 3 cycles with breaks
 swift run -c release pomo -b 3            # 3-min break
 swift run -c release pomo -s /path/to/chime.wav               # Custom sound (any format)
 swift run -c release pomo -d 15 -s ~/Sounds/alert.mp3         # Custom duration + sound
+swift run -c release pomo break                    # 10-minute long break
+swift run -c release pomo break -d 15              # 15-minute long break
+swift run -c release pomo stats                    # Today's statistics
+swift run -c release pomo stats --week             # This week's statistics
+swift run -c release pomo stats --month            # This month's statistics
+swift run -c release pomo stats --year             # This year's statistics
 swift run -c release pomo --help
 
 # Press 'p' to pause/resume, 'c' to skip to next segment
@@ -80,7 +86,9 @@ pomo/
 │   └── pomo/
 │       ├── main.swift          # Entry point, CLI parsing
 │       ├── Timer.swift         # Countdown logic
-│       └── Herdr.swift         # herdr integration
+│       ├── Herdr.swift         # herdr integration
+│       ├── SessionStore.swift  # Persistent session tracking
+│       └── Stats.swift         # Usage stats and reporting
 ├── Tests/
 │   └── pomoTests/
 ├── .swiftlint.yml
@@ -93,3 +101,4 @@ pomo/
 - This is a CLI-only project using Swift Package Manager, not an Xcode project.
 - The timer uses ANSI escape codes to display the countdown in place.
 - When running inside herdr, completion notifications use herdr's system; otherwise the terminal bell is used.
+- **Session tracking:** Sessions are stored in `~/.config/pomo/sessions.json`. Each session records start/end time, planned vs actual duration, session type (work/break), and completion status.

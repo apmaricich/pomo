@@ -6,6 +6,8 @@ A terminal Pomodoro timer written in Swift.
 
 - Customizable work/break durations
 - Multiple work cycles with break intervals
+- Long break command for extended rest periods
+- Session statistics and historical tracking
 - Runs inside [herdr](https://github.com/ogilvieherdr/herdr) with notification support
 - Falls back to terminal bell when not in herdr
 - ANSI-colored countdown display
@@ -35,6 +37,18 @@ pomo -c 3 -s ~/Sounds/pomo.mp3
 
 # Pause/resume: press 'p' during any segment
 # Skip to next segment: press 'c' during any segment
+
+# Long break (10 minutes by default)
+pomo break
+
+# Custom duration long break
+pomo break -d 15
+
+# View statistics
+pomo stats
+pomo stats --week
+pomo stats --month
+pomo stats --year
 ```
 
 ## Timer Controls
@@ -43,6 +57,36 @@ pomo -c 3 -s ~/Sounds/pomo.mp3
 - **c / C** — Skip to the next segment (or completion)
 
 When paused, the timer shows a "PAUSED" indicator and the remaining time freezes. Press 'p' again to resume.
+
+## Statistics
+
+Track your Pomodoro usage over time. Sessions are automatically recorded and can be reviewed:
+
+```bash
+# Today's stats (default)
+pomo stats
+
+# This week
+pomo stats --week
+
+# This month
+pomo stats --month
+
+# This year
+pomo stats --year
+```
+
+### Sample Output
+
+```
+Today's Pomodoro Statistics
+===========================
+Date: 2026-11-15
+Completed Sessions: 4
+Total Work Time: 1h 40m
+Skipped Sessions: 1
+Average Session Length: 25m
+```
 
 ## Configuration
 
@@ -60,6 +104,15 @@ Persistent settings are stored in `~/.config/pomo/config.json`:
 CLI flags override persisted values, which override built-in defaults.
 
 Supports any format playable by afplay: MP3, WAV, AAC, FLAC, AIFF, CAF, OGG, MIDI, and more.
+
+### Session Storage
+
+Completed sessions are stored in `~/.config/pomo/sessions.json`. Each session record includes:
+
+- Start and end timestamps
+- Planned vs. actual duration
+- Session type (work or break)
+- Completion status (completed, skipped, or interrupted)
 
 ## Building
 

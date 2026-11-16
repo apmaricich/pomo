@@ -202,12 +202,14 @@ func waitForContinue(completed: Int, phase: String, cycle: Int, color: String) -
 ///   - phase: Label for the phase (e.g., "WORK").
 ///   - cycle: Cycle number for display.
 ///   - color: ANSI color for the progress bar.
+///   - sessionType: The type of session (work or break) for tracking.
 ///   - onTimerComplete: Optional callback invoked when the timer reaches zero,
 ///     before the user is prompted to continue.
 ///
-/// - Returns: The total time spent in this segment (including overflow), in seconds.
+/// - Returns: A Session object containing the timing data for this segment.
 func runSegment(duration: Int, phase: String, cycle: Int, color: String,
-                onTimerComplete: (() -> Void)? = nil) async -> Int {
+                sessionType: SessionType,
+                onTimerComplete: (() -> Void)? = nil) async -> Session {
     let totalSeconds = duration * 60
     let segmentDuration = totalSeconds
 
@@ -215,6 +217,7 @@ func runSegment(duration: Int, phase: String, cycle: Int, color: String,
     var paused = false
     var totalPausedSeconds = 0
     var pauseStartTime: Date? = nil
+    var completedNaturally = true
 
     // Run the countdown loop using real elapsed time.
     // While paused, elapsed does not advance; on resume, remaining time continues.
@@ -247,15 +250,13 @@ func runSegment(duration: Int, phase: String, cycle: Int, color: String,
                 continue
             }
             if ch == "c" || ch == "C" {
+                completedNaturally = false
                 break
             }
         }
 
         usleep(100_000)
     }
-
-    // Calculate total segment time (including pause)
-    let totalSegmentTime = Int(Date().timeIntervalSince(segmentStartTime))
 
     // Final tick: show 100% complete
     renderTimer(elapsed: totalSeconds, total: totalSeconds, phase: phase, cycle: cycle, color: color)
@@ -264,8 +265,18 @@ func runSegment(duration: Int, phase: String, cycle: Int, color: String,
     onTimerComplete?()
 
     // Wait for user to press 'c' to continue
-    let overflow = waitForContinue(completed: segmentDuration, phase: phase, cycle: cycle, color: color)
+    _ = waitForContinue(completed: segmentDuration, phase: phase, cycle: cycle, color: color)
+
+    let sessionEndTime = Date()
+    let actualDuration = Int(sessionEndTime.timeIntervalSince(segmentStartTime))
 
     writeLine("\n")
-    return totalSegmentTime + overflow
+    return Session(
+        startTime: segmentStartTime,
+        endTime: sessionEndTime,
+        plannedDuration: segmentDuration,
+        actualDuration: actualDuration,
+        type: sessionType,
+        completedNaturally: completedNaturally
+    )
 }
