@@ -102,7 +102,7 @@ func handleWork(overrides: CLIOverrides, config: Config) async {
 
 func handleBreak(overrides: CLIOverrides, config: Config) async {
     let sessionStore = SessionStore()
-    let breakDuration = overrides.duration ?? 600  // 10 minutes default for standalone break
+    let breakDuration = overrides.duration ?? 10  // 10 minutes default for standalone break
     print("🍵 Starting \(breakDuration)-minute break...")
     fflush(stdout)
 
