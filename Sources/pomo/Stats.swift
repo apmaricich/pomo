@@ -6,6 +6,7 @@ struct WorkStats {
     let overflow: Int
     let sessionCount: Int
     let completedNaturallyCount: Int
+    let manualSessionCount: Int
 }
 
 struct BreakStats {
@@ -51,12 +52,16 @@ func getWorkStats(sessions: [Session]) -> WorkStats {
     var totalPlanned = 0
     var totalActual = 0
     var completedNaturallyCount = 0
+    var manualSessionCount = 0
     
     for session in workSessions {
         totalPlanned += session.plannedDuration
         totalActual += session.actualDuration
         if session.completedNaturally {
             completedNaturallyCount += 1
+        }
+        if session.source == .manual {
+            manualSessionCount += 1
         }
     }
     
@@ -67,7 +72,8 @@ func getWorkStats(sessions: [Session]) -> WorkStats {
         totalActual: totalActual,
         overflow: overflow,
         sessionCount: workSessions.count,
-        completedNaturallyCount: completedNaturallyCount
+        completedNaturallyCount: completedNaturallyCount,
+        manualSessionCount: manualSessionCount
     )
 }
 
@@ -118,7 +124,10 @@ func printStats(period: String, work: WorkStats, breaks: BreakStats) {
     // Work Stats
     print("\(ANSI.colorGreen)📈 Work Sessions\(ANSI.reset)")
     print(String(repeating: "-", count: 50))
-    print("  Sessions: \(work.sessionCount)")
+    let sessionLine = work.manualSessionCount > 0
+        ? "  Sessions: \(work.sessionCount) (\(work.manualSessionCount) manual)"
+        : "  Sessions: \(work.sessionCount)"
+    print(sessionLine)
     print("  Completed naturally: \(work.completedNaturallyCount)")
     print("  Total planned: \(formatDuration(seconds: work.totalPlanned))")
     print("  Total actual: \(formatDuration(seconds: work.totalActual))")

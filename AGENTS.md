@@ -24,6 +24,10 @@ swift run -c release pomo stats                    # Today's statistics
 swift run -c release pomo stats --week             # This week's statistics
 swift run -c release pomo stats --month            # This month's statistics
 swift run -c release pomo stats --year             # This year's statistics
+swift run -c release pomo log -m 45                # Log 45 minutes of work
+swift run -c release pomo log -h 2                 # Log 2 hours of work
+swift run -c release pomo log -m 30 -t "10am"      # Log with start time
+swift run -c release pomo log -m 15 --break        # Log a 15-min break
 swift run -c release pomo --help
 
 # Press 'p' to pause/resume, 'c' to skip to next segment

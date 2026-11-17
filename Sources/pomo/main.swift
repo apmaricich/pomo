@@ -9,6 +9,7 @@ enum Subcommand {
     case work
     case breakPeriod
     case stats
+    case log
 }
 
 struct StatsPeriod: CustomStringConvertible {
@@ -26,6 +27,8 @@ func detectSubcommand(_ args: [String]) -> (Subcommand, [String]) {
             return (.breakPeriod, Array(args[2...]))
         case "stats":
             return (.stats, Array(args[2...]))
+        case "log":
+            return (.log, Array(args[2...]))
         default:
             break
         }
@@ -148,6 +151,20 @@ func handleStats(period: StatsPeriod) {
     fflush(stdout)
 }
 
+func handleLog(_ args: [String]) {
+    do {
+        let success = try executeLogCommand(args: args)
+        if success {
+            print("Session logged successfully.")
+            fflush(stdout)
+        }
+    } catch {
+        print("Error logging session: \(error)")
+        fflush(stdout)
+        exit(1)
+    }
+}
+
 func main() async {
     do {
         let (subcommand, subArgs) = detectSubcommand(args)
@@ -166,6 +183,9 @@ func main() async {
         case .stats:
             let period = parseStatsPeriod(subArgs)
             handleStats(period: period)
+            
+        case .log:
+            handleLog(subArgs)
         }
     } catch {
         fputs("Error: \(error)\n", stderr)

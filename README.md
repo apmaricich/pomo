@@ -44,11 +44,24 @@ pomo break
 # Custom duration long break
 pomo break -d 15
 
+# Log completed sessions manually
+pomo log -m 45                    # Log 45 minutes of work
+pomo log -h 2                     # Log 2 hours of work
+pomo log -m 30 -t "10am"          # Log with custom start time
+pomo log -m 15 --break            # Log a 15-minute break
+
 # View statistics
 pomo stats
 pomo stats --week
 pomo stats --month
 pomo stats --year
+
+# Log manual time (for work done without the timer)
+pomo log -m 45                     # Log 45 minutes of work
+pomo log -h 2                      # Log 2 hours of work
+pomo log -m 30 -t "10am"           # Log with custom start time
+pomo log -m 15 --break             # Log a manual break
+pomo log -h 1 -t "14:00"           # Log hours with 24h start time
 ```
 
 ## Timer Controls
@@ -106,6 +119,28 @@ CLI flags override persisted values, which override built-in defaults.
 Supports any format playable by afplay: MP3, WAV, AAC, FLAC, AIFF, CAF, OGG, MIDI, and more.
 
 ### Session Storage
+
+## Log Completed Sessions
+
+Manually log work time or breaks that weren't tracked with the timer:
+
+```bash
+# Log 45 minutes of work
+pomo log -m 45
+
+# Log 2 hours of work
+pomo log -h 2
+
+# Log 30 minutes of work with a custom start time
+pomo log -m 30 -t "10am"
+
+# Log a 15-minute break
+pomo log -m 15 --break
+```
+
+Logged sessions appear in statistics alongside timer sessions.
+
+## Session Storage
 
 Completed sessions are stored in `~/.config/pomo/sessions.json`. Each session record includes:
 
