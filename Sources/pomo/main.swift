@@ -24,11 +24,11 @@ func detectSubcommand(_ args: [String]) -> (Subcommand, [String]) {
     if args.count > 1 {
         switch args[1] {
         case "break":
-            return (.breakPeriod, Array(args[2...]))
+            return (.breakPeriod, Array(args[1...]))
         case "stats":
-            return (.stats, Array(args[2...]))
+            return (.stats, Array(args[1...]))
         case "log":
-            return (.log, Array(args[2...]))
+            return (.log, Array(args[1...]))
         default:
             break
         }
