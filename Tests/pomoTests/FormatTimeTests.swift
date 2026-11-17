@@ -28,7 +28,31 @@ final class FormatTimeTests: XCTestCase {
     }
 
     func testFormatTime_oneHour() {
-        XCTAssertEqual(formatTime(3600), "60:00")
+        XCTAssertEqual(formatTime(3600), "01:00:00")
+    }
+
+    func testFormatTime_justUnderOneHour() {
+        XCTAssertEqual(formatTime(3599), "59:59")
+    }
+
+    func testFormatTime_justOverOneHour() {
+        XCTAssertEqual(formatTime(3601), "01:00:01")
+    }
+
+    func testFormatTime_twoHours() {
+        XCTAssertEqual(formatTime(7200), "02:00:00")
+    }
+
+    func testFormatTime_oneHourThirty() {
+        XCTAssertEqual(formatTime(5400), "01:30:00")
+    }
+
+    func testFormatTime_oneHourFifteen() {
+        XCTAssertEqual(formatTime(4500), "01:15:00")
+    }
+
+    func testFormatTime_fortyFiveMinutes() {
+        XCTAssertEqual(formatTime(2700), "45:00")
     }
 
 }

@@ -26,8 +26,14 @@ enum ANSI {
     static let bell = "\u{7}"
 }
 
-/// Format a number of seconds as MM:SS.
+/// Format a number of seconds as MM:SS, or HH:MM:SS if >= 60 minutes.
 func formatTime(_ seconds: Int) -> String {
+    if seconds >= 3600 {
+        let hours = seconds / 3600
+        let mins = (seconds % 3600) / 60
+        let secs = seconds % 60
+        return String(format: "%02d:%02d:%02d", hours, mins, secs)
+    }
     let mins = seconds / 60
     let secs = seconds % 60
     return String(format: "%02d:%02d", mins, secs)
